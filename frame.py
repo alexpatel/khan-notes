@@ -23,6 +23,8 @@ def frame_worker(video):
     video.nframes = int(capture.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
     cv.notify()
 
+    frame_ptr = -1
+
     # Accept requests from get_frame() indefinitely.
     while True:
         # Wait from queries from get_frame instance.
@@ -36,7 +38,9 @@ def frame_worker(video):
             cv.notify()
             break
         # Set pointer to next frame to index.
-        capture.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, index)
+        if not index == frame_ptr + 1:
+            capture.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, index)
+            frame_ptr = index
         success, frame = capture.read()
         if not success:
             raise Exception("Failed to read frame {0}".format(index))

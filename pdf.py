@@ -1,4 +1,5 @@
-from PIL import Image, ImageOps
+from
+PIL import Image, ImageOps
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
@@ -39,3 +40,15 @@ def new_page(canvas):
     canvas.showPage()
     set_font(canvas)
     reset_cursor(canvas)
+
+def write_string(canvas, string):
+    canvas.drawString(0, cursor, string)
+    cursor -= fontSize
+
+def write_header(canvas, video):
+    format_field = lambda field, val: "{0}: {1}".format(field, val)
+
+    title = format_field("Title", video.title)
+    desc = format_field("Description", video.description)
+    dur = format_field("Duration", video.get_duration())
+

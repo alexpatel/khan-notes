@@ -9,7 +9,7 @@ from frame import get_frame
 import settings
 
 class PDF:
-    def __init__(self, video):
+    def __init__(self, video, output_fn):
         self.video = video
 
         # document settings from global settings
@@ -25,20 +25,23 @@ class PDF:
         self.cursor = 0
 
         # initialize pdf and write video metadata 
-        self._set_pdf_path()
+        self._set_pdf_path(output_fn)
         self._canvas_init()
 
         self._write_header()
         self.write_string("")
 
-    def _set_pdf_path(self):
+    def _set_pdf_path(self, fn):
         """ Set name for output PDF file. """
         # make pdf_dir if it doesn't exist
         try:
             os.mkdir(settings.pdf_dir)
         except Exception:
             pass
-        self.pdf_path = os.path.join(settings.pdf_dir, self.video.readable_id + ".pdf"  )
+        if not fn:
+            fn = self.video.readable_id + ".pdf"
+
+        self.pdf_path = os.path.join(settings.pdf_dir, fn)
 
     def _canvas_init(self):
         """ Initialize and return pdf canvas for video. """

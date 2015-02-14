@@ -78,3 +78,11 @@ class Video:
             temp_video.write(downloader.read())
         except urllib2.URLError, e:
             Exception("Unable to download video: ", self.mp4)
+
+    def get_frame_time(self, frame_num):
+        """ Get time of frame_num in video. Returns string in format H:M:S. """
+        secs = round(self.duration *  frame_num / float(self.nframes))
+        mins, secs = divmod(secs, 60)
+        hrs, mins = divmod(mins, 60)
+        return "%d:%02d:%02d" % (hrs, mins, secs)
+

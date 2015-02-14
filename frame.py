@@ -68,6 +68,13 @@ def start_frame_worker(video):
     cv.release()
     return thread
 
+def exit_frame_worker(fw_thread):
+    """ Kill and reap frame_work thread. """
+    # getting frame -1 causes frame worker to release cv and exit.
+    assert(get_frame(-1) is -1)
+    fw_thread.join()
+    assert(not fw_thread.isAlive())
+
 def get_frame(index):
     """ Get frame at 'index' from video currently loaded in frame_worker. """
     global index_slot

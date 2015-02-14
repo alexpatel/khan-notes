@@ -1,4 +1,7 @@
 import copy
+import math
+import Queue
+import random 
 import threading
 
 import cv2
@@ -49,6 +52,22 @@ def frame_worker(video):
     capture.release() 
     cv.release()
 
+def start_frame_worker(video):
+    """
+        Start a new thread executing frame_worker and ensure it is 
+        waiting on cv. Returns created thread.  
+    """
+    cv.acquire()
+    # Start new frame_worker as a daemon thread.
+    thread = threading.Thread(target=frame_worker, args=(video,))
+    thread.setDaemon(True)
+    thread.start()
+    # Ensure frame metadata is acquired and that frame_worker is waiting on cv.
+    cv.wait()
+    assert(not video.nframes is -1)
+    cv.release()
+    return thread
+
 def get_frame(index):
     """ Get frame at 'index' from video currently loaded in frame_worker. """
     global index_slot
@@ -59,9 +78,6 @@ def get_frame(index):
     cv.acquire()
     assert(index_slot is None)
     index_slot = index
-
-    # we know the frame worker thread is waiting because get_frame calls are
-    # all from same thread
     cv.notify() 
 
     # Wait for frame_worker to load frame.

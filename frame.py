@@ -1,7 +1,4 @@
 import copy
-import math
-import Queue
-import random 
 import threading
 
 import cv2
@@ -75,7 +72,13 @@ def exit_frame_worker(fw_thread):
     fw_thread.join()
     assert(not fw_thread.isAlive())
 
-def get_frame(index):
+def convert_bw(frame):
+    """ Convert a frame to black and white. """
+    grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    thresh, bw = cv2.threshold(grayscale, 50, 255, cv2.THRESH_BINARY_INV)
+    return bw
+
+def get_frame(index, bw=False):
     """ Get frame at 'index' from video currently loaded in frame_worker. """
     global index_slot
     global frame_slot
@@ -93,4 +96,6 @@ def get_frame(index):
     frame = copy.deepcopy(frame_slot)
     frame_slot = None
     cv.release()
+    if bw:
+        return convert_bw(frame)
     return frame

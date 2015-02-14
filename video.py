@@ -1,6 +1,9 @@
 import json
+import os
 import urllib2 
 import urlparse
+
+import settings
 
 class Video:
     def __init__(self, video_url):
@@ -30,6 +33,17 @@ class Video:
         except urllib2.URLError, AttributeError:
             Exception("Unable to access Khan Academy API: ", api_query)
 
+    def set_video_path(self):
+        """ Set the path where the video will be downloaded.  """
+        assert(self.readable_id)
+        # make video directory if it doesn't already exist
+        try:
+            os.mkdir(settings.video_dir)
+        except Exception:
+            pass
+        # create filename
+        self.video_path = os.path.join(settings.video_dir, self.readable_id + ".mp4")
+
     def extract_json_data(self):
         """ Extract video metadata from raw API response. """
         raw_json = self.raw_json
@@ -51,3 +65,16 @@ class Video:
         self.extract_readable_id()
         self.query_video_data() 
         self.extract_json_data()
+
+    def download(self):
+        """ Download .mp4 version of video and saves to self.video_path. """
+        if os.path.isfile(self.video_path):
+            print "Video already downloaded. Skipping..."
+            return
+        print "Downloading video..."
+        try:
+            downloader = urllib2.urlopen(self.mp4) 
+            temp_video = open(self.video_path, 'wb')
+            temp_video.write(downloader.read())
+        except urllib2.URLError, e:
+            Exception("Unable to download video: ", self.mp4)

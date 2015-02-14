@@ -1,5 +1,6 @@
 import optparse 
 
+from frame import start_frame_worker, exit_frame_worker 
 from video import Video
 
 def parse_arg_list(argv):
@@ -30,6 +31,11 @@ def main():
     video = Video(video_url)
     video.get_metadata()
     video.download()
+
+    # start thread to serve video frames
+    frame_worker = start_frame_worker(video)
+
+    exit_frame_worker(frame_worker)
 
 if __name__ == "__main__":
     main()

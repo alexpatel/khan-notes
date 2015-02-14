@@ -48,3 +48,26 @@ def frame_worker(video):
     # Close video and return.
     capture.release() 
     cv.release()
+
+def get_frame(index):
+    """ Get frame at 'index' from video currently loaded in frame_worker. """
+    global index_slot
+    global frame_slot
+    global cv
+
+    # Send index to frame_worker.  
+    cv.acquire()
+    assert(index_slot is None)
+    index_slot = index
+
+    # we know the frame worker thread is waiting because get_frame calls are
+    # all from same thread
+    cv.notify() 
+
+    # Wait for frame_worker to load frame.
+    cv.wait()
+    # Copy and then wipe slot contents.
+    frame = copy.deepcopy(frame_slot)
+    frame_slot = None
+    cv.release()
+    return frame

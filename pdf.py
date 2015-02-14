@@ -84,3 +84,19 @@ def write_frame(canvas, video, frame_ndx):
     canvas.drawInlineImage(image, 0, cursor, img_width, img_height)
     write_string(canvas, "")
 
+def create_pdf(video, frame_ndxs):
+    """ Create video with frames at each index in frame_ndxs. """
+    print "Creating output PDF..."
+
+    canvas = pdf_init(video)
+    write_header(canvas, video)
+    write_string(canvas, "")
+
+    # write two frames per page
+    for i in xrange(0, len(frame_ndxs), 2):
+        if not i is 0 and i % 2 is 0:
+            new_page(canvas)
+        write_frame(canvas, video, frame_ndxs[i])
+        if not i + 1 is len(frame_ndxs):
+            write_frame(canvas, video, frame_ndxs[i + 1])
+    canvas.save()

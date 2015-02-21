@@ -77,14 +77,20 @@ class PDF:
         video = self.video
 
         # metadata fields to write 
-        title = format_field("Title", video.title)
-        desc = format_field("Description", video.description)
-        dur = format_field("Duration", video.get_duration())
+        title = format_field("Title", self.video.title)
+        desc = format_field("Description", self.video.description)
+        dur = format_field("Duration", self.video.get_duration())
 
         # write to canvas
         self.write_string(title)
         self.write_string(desc)
         self.write_string(dur)
+
+        # license
+        if self.video.license:
+            self.write_string("")
+            self.write_string("License: CC by NC SA <https://creativecommons.org/licenses/by-nc-sa/3.0/us/>")
+            self.write_string("NOTE: All Khan Acdemy content is available for free at <www.khanacademy.org>")
 
     def _write_frame(self, video, frame_ndx):
         """ Write frame at index frame_ndx to canvas. """

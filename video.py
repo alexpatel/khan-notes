@@ -51,11 +51,22 @@ class Video:
         self.title = raw_json['title']
         self.duration = raw_json['duration']
         self.download_urls = raw_json['download_urls'] 
+
+        # ensure video is downloadable in mp4
         if self.download_urls['mp4']:
             self.mp4 = self.download_urls['mp4']
             self.set_video_path()
         else:
             raise Exception("No MP4 available for video.")
+
+        # ensure license is CC by NC SA (KA default)
+        try:
+            self.license = raw_json["ka_user_license"]
+            if not self.license == "cc-by-nc-sa":
+                raise Exception("License not recognized: {0}".format(self.license))
+        except KeyError:
+            pass
+        self.license = raw_json["ka_user_license"]
 
     def get_metadata(self):
         """

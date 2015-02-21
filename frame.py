@@ -14,6 +14,8 @@ def frame_worker(video):
     global frame_slot
     global cv
 
+    frame_ptr = -1
+
     cv.acquire()
     capture = cv2.VideoCapture(video.video_path)
 
@@ -22,8 +24,6 @@ def frame_worker(video):
     video.height = int(capture.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)) 
     video.nframes = int(capture.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
     cv.notify()
-
-    frame_ptr = -1
 
     # Accept requests from get_frame() indefinitely.
     while True:
@@ -39,8 +39,9 @@ def frame_worker(video):
             break
         # Set pointer to next frame to index.
         if not index == frame_ptr + 1:
+            # move capture pointer if index is not next frame to read 
             capture.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, index)
-            frame_ptr = index
+        frame_ptr = index
         success, frame = capture.read()
         if not success:
             raise Exception("Failed to read frame {0}".format(index))
